@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task 3 - Responsive | Quiz | Weather</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+      color: #222;
+    }
+
+    header {
+      background: #004d40;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    main {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+
+    section:hover {
+      transform: translateY(-5px);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #00695c;
+    }
+
+    /* Responsive Demo */
+    .responsive-box {
+      padding: 20px;
+      color: white;
+      font-weight: bold;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .desktop { background: #0077b6; }
+    .tablet { background: #ff8800; display: none; }
+    .mobile { background: #38b000; display: none; }
+
+    /* Quiz Styles */
+    .question {
+      font-size: 18px;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #0288d1;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .options button:hover { background: #01579b; }
+
+    #next-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #38b000;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+    }
+
+    /* Weather Styles */
+    #weatherResult {
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    input {
+      padding: 10px;
+      width: 80%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    button.weather-btn {
+      background: #ff8800;
+      padding: 10px 15px;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button.weather-btn:hover { background: #e65100; }
+
+    /* Media Queries */
+    @media (max-width: 992px) {
+      main {
+        grid-template-columns: 1fr 1fr;
+      }
+      .desktop { display: none; }
+      .tablet { display: block; }
+    }
+
+    @media (max-width: 600px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      .tablet { display: none; }
+      .mobile { display: block; }
+    }
+
+    footer {
+      text-align: center;
+      background: #004d40;
+      color: white;
+      padding: 15px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🚀 Task 3 - Responsive | Quiz | Weather</h1>
+    <p>Responsive Design | Quiz App | Weather API</p>
+  </header>
+
+  <main>
+    <!-- Responsive Section -->
+    <section>
+      <h2>📱 Responsive Design Demo</h2>
+      <div class="responsive-box desktop">This is Desktop View</div>
+      <div class="responsive-box tablet">This is Tablet View</div>
+      <div class="responsive-box mobile">This is Mobile View</div>
+      <p>Resize the window to see how content changes for different devices.</p>
+    </section>
+
+    <!-- Quiz Section -->
+    <section>
+      <h2>📝 Quiz App</h2>
+      <div id="quiz">
+        <div class="question" id="question">Question text</div>
+        <div class="options" id="options"></div>
+        <button id="next-btn" onclick="nextQuestion()">Next</button>
+        <div class="result" id="quizResult"></div>
+      </div>
+    </section>
+
+    <!-- Weather Section -->
+    <section>
+      <h2>🌦 Weather App</h2>
+      <input type="text" id="cityInput" placeholder="Enter city name">
+      <button class="weather-btn" onclick="getWeather()">Get Weather</button>
+      <div id="weatherResult"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Task 3 Project | Built with ❤️ using HTML, CSS & JavaScript</p>
+  </footer>
+
+  <script>
+    // ---------------- QUIZ APP ----------------
+    const quizData = [
+      { question: "1. Which language structures web pages?", options: ["HTML","CSS","JS","Python"], correct: "HTML" },
+      { question: "2. Which CSS property changes text color?", options: ["font-style","text-color","color","background"], correct: "color" },
+      { question: "3. Which method fetches API data?", options: ["fetch()","getData()","request()","load()"], correct: "fetch()" }
+    ];
+
+    let currentQuestion = 0, score = 0;
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const resultEl = document.getElementById("quizResult");
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = "";
+      resultEl.textContent = "";
+
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(option, q.correct);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(answer, correct) {
+      if(answer === correct) {
+        score++;
+        resultEl.textContent = "✅ Correct!";
+        resultEl.style.color = "green";
+      } else {
+        resultEl.textContent = "❌ Wrong!";
+        resultEl.style.color = "red";
+      }
+      nextBtn.style.display = "block";
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if(currentQuestion < quizData.length) {
+        loadQuestion();
+        nextBtn.style.display = "none";
+      } else {
+        questionEl.style.display = "none";
+        optionsEl.style.display = "none";
+        nextBtn.style.display = "none";
+        resultEl.textContent = `🏆 You scored ${score} / ${quizData.length}!`;
+        resultEl.style.color = "blue";
+      }
+    }
+    loadQuestion();
+
+    // ---------------- WEATHER APP ----------------
+    async function getWeather() {
+      const city = document.getElementById("cityInput").value.trim();
+      const resultDiv = document.getElementById("weatherResult");
+
+      if(city === "") {
+        resultDiv.textContent = "⚠️ Please enter a city name.";
+        resultDiv.style.color = "red";
+        return;
+      }
+
+      try {
+        // Demo: using Open-Meteo with fixed coords (Hyderabad)
+        const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=17.3850&longitude=78.4867&current_weather=true");
+        const data = await response.json();
+        resultDiv.style.color = "black";
+        resultDiv.innerHTML = `
+          ✅ Weather for Hyderabad (demo)<br>
+          🌡 Temperature: ${data.current_weather.temperature}°C<br>
+          💨 Wind Speed: ${data.current_weather.windspeed} km/h
+        `;
+      } catch (error) {
+        resultDiv.textContent = "❌ Could not fetch weather data.";
+        resultDiv.style.color = "red";
+      }
+    }
+  </script>
+</body>
+</html>
